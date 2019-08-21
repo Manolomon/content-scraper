@@ -12,7 +12,7 @@ def write_index(url, output):
     open(output + '/index.html', 'wb').write(response.content)
     download_scripts(url, output, html)
     download_images(url, output, html)
-
+    download_styles(url, output, html)
 
 def download_scripts(url, output, html):   
     for script in html.findAll('script', {"src":True}):
@@ -26,6 +26,15 @@ def download_scripts(url, output, html):
 def download_images(url, output, html):
     for img in html.findAll('img', {"src":True}):
         source = img['src']
+        path = output + source
+        response = requests.get(url + source)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as file:
+            file.write(response.content)
+
+def download_styles(url, output, html):
+    for style in html.findAll('link', {"rel":"stylesheet"}):
+        source = style['href']
         path = output + source
         response = requests.get(url + source)
         os.makedirs(os.path.dirname(path), exist_ok=True)
